@@ -14,6 +14,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(TEST_SOURCES
         Limiter
         Compressor
+        Expander
 )
 
 # Define a function to reduce redundancy
