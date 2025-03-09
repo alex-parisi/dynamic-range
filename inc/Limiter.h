@@ -127,7 +127,7 @@ private:
                 (m_config.threshold + (m_config.kneeWidth.value() / 2.0))) {
                 return m_config.threshold;
             }
-            float numerator =
+            T numerator =
                     std::pow(inputDecibels - m_config.threshold +
                                      (m_config.kneeWidth.value() / 2.0),
                              2.0);
@@ -148,16 +148,16 @@ private:
      * @param inputDecibels Input in decibels
      */
     void update_gain_smoothing(T xSc, T inputDecibels) {
-        float gC = xSc - inputDecibels;
-        float alpha = [this, &gC]() -> float {
+        T gC = xSc - inputDecibels;
+        T alpha = [this, &gC]() -> T {
             if (gC <= m_gainSmoothing) {
-                return std::exp(-log10(9.0f) /
+                return std::exp(-log10(9.0) /
                                 (m_config.attack * m_config.sampleRate));
             }
-            return std::exp(-log10(9.0f) /
+            return std::exp(-log10(9.0) /
                             (m_config.release * m_config.sampleRate));
         }();
-        m_gainSmoothing = alpha * m_gainSmoothing + (1.0f - alpha) * gC;
+        m_gainSmoothing = alpha * m_gainSmoothing + (1.0 - alpha) * gC;
     }
 
     /** Limiter configuration */
