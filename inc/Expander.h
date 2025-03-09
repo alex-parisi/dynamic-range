@@ -33,9 +33,25 @@ SOFTWARE.
  */
 template<typename T = double>
 struct ExpanderConfiguration {
+    /** Sample rate */
     int sampleRate = 0.0;
-    T threshold, attack, release, ratio;
+
+    /** Threshold in decibels */
+    T threshold = static_cast<T>(0);
+
+    /** Attack time in milliseconds */
+    std::chrono::milliseconds attack = std::chrono::milliseconds(0);
+
+    /** Release time in milliseconds */
+    std::chrono::milliseconds release = std::chrono::milliseconds(0);
+
+    /** The ratio of the expander */
+    T ratio = static_cast<T>(0);
+
+    /** Makeup gain in decibels */
     std::optional<T> makeupGain = std::nullopt;
+
+    /** Knee width in decibels */
     std::optional<T> kneeWidth = std::nullopt;
 };
 
@@ -66,7 +82,8 @@ public:
         if (configuration.sampleRate <= 0) {
             return std::nullopt;
         }
-        if (configuration.attack <= 0 || configuration.release <= 0) {
+        if (configuration.attack.count() <= 0 ||
+            configuration.release.count() <= 0) {
             return std::nullopt;
         }
         return Expander(configuration);
@@ -102,6 +119,15 @@ public:
      */
     auto reset() -> void { m_gainSmoothing = 0.0; }
 
+    /**
+     * @brief Set the expander configuration after creation
+     * @param configuration Expander configuration
+     */
+    auto set_configuration(ExpanderConfiguration<T> configuration) -> void {
+        m_config = configuration;
+        calculate_intermediate_values();
+    }
+
 private:
     /**
      * @brief Private constructor
@@ -113,6 +139,21 @@ private:
         if (!m_config.makeupGain.has_value()) {
             m_config.makeupGain = 0.0 - calculate_static_characteristic(0.0);
         }
+        calculate_intermediate_values();
+    }
+
+    /**
+     * @brief Calculate intermediate values
+     */
+    auto calculate_intermediate_values() -> void {
+        m_attackValue =
+                std::exp(-log10(9.0) /
+                         ((static_cast<T>(m_config.attack.count()) / 1000.0) *
+                          m_config.sampleRate));
+        m_releaseValue =
+                std::exp(-log10(9.0) /
+                         ((static_cast<T>(m_config.release.count()) / 1000.0) *
+                          m_config.sampleRate));
     }
 
     /**
@@ -156,9 +197,9 @@ private:
         T gC = xSc - inputDecibels;
         T alpha = [this, &gC]() -> T {
             if (gC >= m_gainSmoothing) {
-                return std::exp(-log10(9.0) / (m_config.attack * m_config.sampleRate));
+                return m_attackValue;
             }
-            return std::exp(-log10(9.0) / (m_config.release * m_config.sampleRate));
+            return m_releaseValue;
         }();
         m_gainSmoothing = alpha * m_gainSmoothing + (1.0 - alpha) * gC;
     }
@@ -168,6 +209,9 @@ private:
 
     /** Gain smoothing */
     T m_gainSmoothing = 0;
+
+    T m_attackValue = 0;
+    T m_releaseValue = 0;
 };
 
 #endif // EXPANDER_H

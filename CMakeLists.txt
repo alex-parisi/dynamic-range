@@ -15,6 +15,7 @@ set(TEST_SOURCES
         Limiter
         Compressor
         Expander
+        NoiseGate
 )
 
 # Define a function to reduce redundancy
@@ -51,6 +52,6 @@ function(add_filter_test test_name)
 endfunction()
 
 # Add all tests using the function
-foreach(test ${TEST_SOURCES})
+foreach (test ${TEST_SOURCES})
     add_filter_test(${test})
-endforeach()
+endforeach ()

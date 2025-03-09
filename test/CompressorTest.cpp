@@ -4,65 +4,70 @@
 #include "Compressor.h"
 
 TEST(CompressorTest, CreateCompressorSuccess) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 48000,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.01f,
-                                                           .release = 0.1f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 48000,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(10),
+            .release = std::chrono::milliseconds(100),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     const std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_TRUE(limiter.has_value());
 }
 
 TEST(CompressorTest, CreateCompressorFailureInvalidSampleRate) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 0,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.01f,
-                                                           .release = 0.1f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 0,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(10),
+            .release = std::chrono::milliseconds(100),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     const std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_FALSE(limiter.has_value());
 }
 
 TEST(CompressorTest, CreateCompressorFailureInvalidAttack) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 48000,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.0f,
-                                                           .release = 0.1f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 48000,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(0),
+            .release = std::chrono::milliseconds(100),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     const std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_FALSE(limiter.has_value());
 }
 
 TEST(CompressorTest, CreateCompressorFailureInvalidRelease) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 48000,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.0f,
-                                                           .release = -1.0f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 48000,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(10),
+            .release = std::chrono::milliseconds(0),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     const std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_FALSE(limiter.has_value());
 }
 
 TEST(CompressorTest, ProcessSampleBelowThreshold) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 48000,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.01f,
-                                                           .release = 0.1f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 48000,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(10),
+            .release = std::chrono::milliseconds(100),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_TRUE(limiter.has_value());
@@ -72,13 +77,14 @@ TEST(CompressorTest, ProcessSampleBelowThreshold) {
 }
 
 TEST(CompressorTest, ProcessSampleAboveThreshold) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 48000,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.01f,
-                                                           .release = 0.1f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 48000,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(10),
+            .release = std::chrono::milliseconds(100),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_TRUE(limiter.has_value());
@@ -88,13 +94,14 @@ TEST(CompressorTest, ProcessSampleAboveThreshold) {
 }
 
 TEST(CompressorTest, ResetCompressor) {
-    constexpr auto config = CompressorConfiguration<float>{.sampleRate = 48000,
-                                                           .threshold = -10.0f,
-                                                           .attack = 0.01f,
-                                                           .release = 0.1f,
-                                                           .ratio = 5.0f,
-                                                           .makeupGain = 5.0f,
-                                                           .kneeWidth = 5.0f};
+    constexpr auto config = CompressorConfiguration<float>{
+            .sampleRate = 48000,
+            .threshold = -10.0f,
+            .attack = std::chrono::milliseconds(10),
+            .release = std::chrono::milliseconds(100),
+            .ratio = 5.0f,
+            .makeupGain = 5.0f,
+            .kneeWidth = 5.0f};
     std::optional<Compressor<float>> limiter =
             Compressor<float>::create(config);
     ASSERT_TRUE(limiter.has_value());
