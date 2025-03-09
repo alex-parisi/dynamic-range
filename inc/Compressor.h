@@ -29,7 +29,7 @@ SOFTWARE.
 
 /**
  * @brief Compressor configuration
- * @tparam T Type of the limiter
+ * @tparam T Type of the compressor
  */
 template<typename T = double>
 struct CompressorConfiguration {
@@ -40,22 +40,26 @@ struct CompressorConfiguration {
 };
 
 /**
- * @brief Limiter class. Implements a limiter with optional makeup gain and
- * knee width.
- * @details The limiter is implemented as a class with a process method that
- * takes a sample and processes it. The process method calculates the static
- * characteristic of the limiter, updates the gain smoothing, and applies the
- * makeup gain. The class also has a process method that takes an array of
- * samples and processes them all.
- * @tparam T Type of the limiter
+ * @brief Compressor class. Implements a compressor with optional makeup gain
+ * and knee width.
+ * @details A compressor is a device that reduces the dynamic range of an audio
+ * signal. It does so by attenuating the signal when it exceeds a certain
+ * threshold. The amount of attenuation is determined by the ratio parameter.
+ * The attack and release parameters determine how quickly the compressor
+ * responds to changes in the input signal. The makeup gain parameter is used to
+ * increase the overall gain of the signal after compression. The knee width
+ * parameter determines the width of the knee of the compressor's characteristic
+ * curve. A larger knee width results in a smoother transition between the
+ * compressed and uncompressed regions of the characteristic curve.
+ * @tparam T Type of the compressor
  */
 template<typename T = double>
 class Compressor {
 public:
     /**
      * @brief Public constructor
-     * @param configuration Limiter configuration
-     * @return A Limiter object
+     * @param configuration Compressor configuration
+     * @return A Compressor object
      */
     auto static create(CompressorConfiguration<T> configuration)
             -> std::optional<Compressor> {
@@ -94,14 +98,14 @@ public:
     }
 
     /**
-     * @brief Resets the limiter
+     * @brief Resets the compressor
      */
     auto reset() -> void { m_gainSmoothing = 0.0; }
 
 private:
     /**
      * @brief Private constructor
-     * @param configuration Limiter configuration
+     * @param configuration Compressor configuration
      */
     explicit Compressor(CompressorConfiguration<T> configuration) :
         m_config(configuration) {
@@ -112,7 +116,7 @@ private:
     }
 
     /**
-     * @brief Calculate the static characteristic of the limiter
+     * @brief Calculate the static characteristic of the compressor
      * @param inputDecibels Input in decibels
      * @return The static characteristic
      */

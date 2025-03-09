@@ -42,11 +42,14 @@ struct LimiterConfiguration {
 /**
  * @brief Limiter class. Implements a limiter with optional makeup gain and
  * knee width.
- * @details The limiter is implemented as a class with a process method that
- * takes a sample and processes it. The process method calculates the static
- * characteristic of the limiter, updates the gain smoothing, and applies the
- * makeup gain. The class also has a process method that takes an array of
- * samples and processes them all.
+ * @details A limiter is a device that prevents the output signal from exceeding
+ * a certain threshold. It does so by attenuating the signal when it exceeds the
+ * threshold. The attack and release parameters determine how quickly the
+ * limiter responds to changes in the input signal. The makeup gain parameter is
+ * used to increase the overall gain of the signal after limiting. The knee
+ * width parameter determines the width of the knee of the limiter's
+ * characteristic curve. A larger knee width results in a smoother transition
+ * between the limited and unlimited regions of the characteristic curve.
  * @tparam T Type of the limiter
  */
 template<typename T = double>
@@ -127,13 +130,11 @@ private:
                 (m_config.threshold + (m_config.kneeWidth.value() / 2.0))) {
                 return m_config.threshold;
             }
-            T numerator =
-                    std::pow(inputDecibels - m_config.threshold +
-                                     (m_config.kneeWidth.value() / 2.0),
-                             2.0);
+            T numerator = std::pow(inputDecibels - m_config.threshold +
+                                           (m_config.kneeWidth.value() / 2.0),
+                                   2.0);
             return inputDecibels -
-                   (numerator /
-                    (2.0 * m_config.kneeWidth.value()));
+                   (numerator / (2.0 * m_config.kneeWidth.value()));
         }
         /// Hard knee
         if (inputDecibels < m_config.threshold) {
